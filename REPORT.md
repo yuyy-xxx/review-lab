@@ -18,3 +18,6 @@
 
 ## Ссылка на репозиторий / 仓库链接
 https://github.com/yuyy-xxx/review-lab
+
+## Дополнительные репозитории / 附加仓库
+- Git branch practice (lab4): https://github.com/yuyy-xxx/lab4
