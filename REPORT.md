@@ -9,14 +9,12 @@
 - Author B: открыл PR #2 (feature/status-transitions), провёл Code Review PR #1
 
 ## Выполненные задачи / 已完成工作
-1. Создание репозитория и трёх веток (main, feature/description-validator, feature/status-transitions)
+1. Создание репозитория и трёх веток
 2. Два pull request с обеих сторон
-3. Code Review PR #1: 8 строчных комментариев,覆盖 6 категорий чек-листа
+3. Code Review PR #1: 8 строчных комментариев, 6 категорий чек-листа
 4. Создан docs/review-checklist.md
-
-## Невыполненные пункты / 未完成项
-- Тесты DescriptionValidatorTests.cs не добавлены
-- Метод Validate() не реализован
+5. Реализован метод Validate() с проверкой длины описания (FR-001)
+6. Добавлены юнит-тесты DescriptionValidatorTests.cs
 
 ## Ссылка на репозиторий / 仓库链接
 https://github.com/yuyy-xxx/review-lab
