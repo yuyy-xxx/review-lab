@@ -219,3 +219,61 @@ if __name__ == "__main__":
         n = Neuron(n_inputs=3, activation=name)
         out = n.forward(x)
         print(f"{name:6s} -> {out}")
+### Экспорт нейрона в формат ONNX
+### 将神经元导出为ONNX格式
+Код:
+```python
+import numpy as np
+from onnx import helper, TensorProto, checker
+import onnx
+
+def create_formal_neuron_onnx(num_inputs, activation_type="relu", output_path="formal_neuron.onnx"):
+    input_tensor = helper.make_tensor_value_info(
+        "input", TensorProto.FLOAT, [num_inputs]
+    )
+    output_tensor = helper.make_tensor_value_info(
+        "output", TensorProto.FLOAT, [1]
+    )
+
+    w_data = np.random.randn(num_inputs).astype(np.float32) * 0.1
+    b_data = np.array([0.1], dtype=np.float32)
+
+    w_init = helper.make_tensor("W", TensorProto.FLOAT, [num_inputs], w_data)
+    b_init = helper.make_tensor("B", TensorProto.FLOAT, [1], b_data)
+
+    dot_node = helper.make_node("Dot", ["input", "W"], ["dot_out"])
+    add_node = helper.make_node("Add", ["dot_out", "B"], ["z"])
+
+    act_map = {
+        "relu": helper.make_node("Relu", ["z"], ["output"]),
+        "sigmoid": helper.make_node("Sigmoid", ["z"], ["output"]),
+        "tanh": helper.make_node("Tanh", ["z"], ["output"]),
+        "linear": helper.make_node("Identity", ["z"], ["output"])
+    }
+    act_node = act_map[activation_type]
+
+    graph = helper.make_graph(
+        nodes=[dot_node, add_node, act_node],
+        name="formal_neuron_graph",
+        inputs=[input_tensor],
+        outputs=[output_tensor],
+        initializer=[w_init, b_init]
+    )
+
+    model = helper.make_model(
+        graph,
+        producer_name="Formal Neuron",
+        opset_imports=[helper.make_opsetid("", 11)]
+    )
+    checker.check_model(model)
+    onnx.save(model, output_path)
+    print(f"✅ ONNX модель сохранена: {output_path}")
+    return model
+
+
+if __name__ == "__main__":
+    create_formal_neuron_onnx(
+        num_inputs=3,
+        activation_type="relu",
+        output_path="formal_neuron.onnx"
+    )
