@@ -172,3 +172,50 @@ if __name__ == "__main__":
     print(f"linear 输出: {y1:.4f}")
     print(f"relu   输出: {y2:.4f}")
     print(f"tansig 输出: {y3:.4f}")
+### Классовая реализация одного нейрона
+### 单个神经元面向对象实现
+Код:
+```python
+import numpy as np
+
+def relu(z):
+    return np.maximum(0, z)
+
+def tansig(z):
+    return np.tanh(z)
+
+def logsig(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+def softmax(z):
+    exp_z = np.exp(z - np.max(z))
+    return exp_z / np.sum(exp_z)
+
+ACTIVATIONS = {
+    "linear": lambda z: z,
+    "relu": relu,
+    "tansig": tansig,
+    "logsig": logsig,
+    "softmax": softmax
+}
+
+class Neuron:
+    def __init__(self, n_inputs, activation="linear"):
+        if activation not in ACTIVATIONS:
+            raise ValueError("Не поддерживается данная функция активации")
+        self.activation_name = activation
+        self.activation_func = ACTIVATIONS[activation]
+        self.weights = np.random.randn(n_inputs) * 0.1
+        self.bias = 0.1
+
+    def forward(self, x):
+        z = np.dot(self.weights, x) + self.bias
+        return self.activation_func(z)
+
+
+if __name__ == "__main__":
+    x = np.array([1.0, 2.0, 3.0])
+    for name in ["linear", "relu", "tansig", "logsig", "softmax"]:
+        n = Neuron(n_inputs=3, activation=name)
+        out = n.forward(x)
+        print(f"{name:6s} -> {out}")
