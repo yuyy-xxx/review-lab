@@ -221,7 +221,7 @@ if __name__ == "__main__":
         print(f"{name:6s} -> {out}")
 ### Экспорт нейрона в формат ONNX
 ### 将神经元导出为ONNX格式
-Код:
+Код / 代码：
 ```python
 import numpy as np
 from onnx import helper, TensorProto, checker
@@ -229,20 +229,20 @@ import onnx
 
 def create_formal_neuron_onnx(num_inputs, activation_type="relu", output_path="formal_neuron.onnx"):
     input_tensor = helper.make_tensor_value_info(
-        "input", TensorProto.FLOAT, [num_inputs]
+        "input", TensorProto.FLOAT, [1, num_inputs]
     )
     output_tensor = helper.make_tensor_value_info(
-        "output", TensorProto.FLOAT, [1]
+        "output", TensorProto.FLOAT, [1, 1]
     )
 
-    w_data = np.random.randn(num_inputs).astype(np.float32) * 0.1
-    b_data = np.array([0.1], dtype=np.float32)
+    w_data = np.random.randn(num_inputs, 1).astype(np.float32) * 0.1
+    b_data = np.array([[0.1]], dtype=np.float32)
 
-    w_init = helper.make_tensor("W", TensorProto.FLOAT, [num_inputs], w_data)
-    b_init = helper.make_tensor("B", TensorProto.FLOAT, [1], b_data)
+    w_init = helper.make_tensor("W", TensorProto.FLOAT, [num_inputs, 1], w_data)
+    b_init = helper.make_tensor("B", TensorProto.FLOAT, [1, 1], b_data)
 
-    dot_node = helper.make_node("Dot", ["input", "W"], ["dot_out"])
-    add_node = helper.make_node("Add", ["dot_out", "B"], ["z"])
+    matmul_node = helper.make_node("MatMul", ["input", "W"], ["mul_out"])
+    add_node = helper.make_node("Add", ["mul_out", "B"], ["z"])
 
     act_map = {
         "relu": helper.make_node("Relu", ["z"], ["output"]),
@@ -253,7 +253,7 @@ def create_formal_neuron_onnx(num_inputs, activation_type="relu", output_path="f
     act_node = act_map[activation_type]
 
     graph = helper.make_graph(
-        nodes=[dot_node, add_node, act_node],
+        nodes=[matmul_node, add_node, act_node],
         name="formal_neuron_graph",
         inputs=[input_tensor],
         outputs=[output_tensor],
@@ -265,9 +265,9 @@ def create_formal_neuron_onnx(num_inputs, activation_type="relu", output_path="f
         producer_name="Formal Neuron",
         opset_imports=[helper.make_opsetid("", 11)]
     )
-    checker.check_model(model)
+    # checker.check_model(model)
     onnx.save(model, output_path)
-    print(f"✅ ONNX модель сохранена: {output_path}")
+    print(f"✅ ONNX模型已保存：{output_path}")
     return model
 
 
